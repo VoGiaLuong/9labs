@@ -1,0 +1,28 @@
+android {
+    namespace 'com.vogialuong.lab05'  // Đảm bảo khai báo namespace chính xác
+
+    compileSdkVersion 34  // Hoặc phiên bản SDK phù hợp với Flutter
+
+    defaultConfig {
+        applicationId "com.vogialuong.lab05"
+        minSdkVersion 21  // Hoặc phiên bản SDK min của bạn
+        targetSdkVersion 33  // Hoặc phiên bản SDK target
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
