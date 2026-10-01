@@ -4,16 +4,13 @@ import 'package:flutter/material.dart';
 void main() => runApp(XylophoneApp());
 
 class XylophoneApp extends StatelessWidget {
-  // Tạo một đối tượng AudioPlayer duy nhất để sử dụng lại
-  final AudioPlayer _player = AudioPlayer();
-  final AudioCache _audioCache = AudioCache(); // Tạo AudioCache để xử lý âm thanh từ assets
+  XylophoneApp({super.key});
 
+  final AudioCache _audioCache = AudioCache();
 
-  // Phương thức để phát âm thanh
-  void playSound(int soundNumber) async {
-    // Dùng phương thức play để phát âm thanh từ asset
-    await _audioCache.play('assets/note$soundNumber.wav');  // Chỉ định nguồn âm thanh từ assets
-    // await _player.play('assets/note1.wav');
+  Future<void> playSound(int soundNumber) async {
+    // AudioCache tự động tìm tệp bên trong thư mục assets/.
+    await _audioCache.play('note$soundNumber.wav');
   }
 
   // Xây dựng nút cho mỗi phím đàn
@@ -21,7 +18,7 @@ class XylophoneApp extends StatelessWidget {
     return Expanded(
       child: TextButton(
         style: TextButton.styleFrom(backgroundColor: color),
-        onPressed: () => playSound(soundNumber),  // Khi nhấn sẽ phát âm thanh
+        onPressed: () => playSound(soundNumber), // Khi nhấn sẽ phát âm thanh
         child: const Text(''),
       ),
     );
@@ -55,4 +52,3 @@ class XylophoneApp extends StatelessWidget {
     );
   }
 }
-

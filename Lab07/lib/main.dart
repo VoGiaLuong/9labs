@@ -29,7 +29,7 @@ class DestiniApp extends StatelessWidget {
         location: BannerLocation.bottomEnd,
         child: child ?? const SizedBox.shrink(),
       ),
-      title: 'Destini',
+      title: 'Nhiệm vụ giải cứu thư viện',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -134,8 +134,8 @@ class _StoryPageState extends State<StoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Destini'),
+          appBar: AppBar(
+        title: Text('Giải cứu thư viện'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -143,30 +143,68 @@ class _StoryPageState extends State<StoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              storyData[storyIndex].storyTitle,
-              style: TextStyle(fontSize: 20.0),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () => nextStory(1),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Thay đổi từ `primary` thành `backgroundColor`
+            List<Story> storyData = [
+              Story(
+                storyTitle: 'Cuốn sách cổ của thư viện đã biến mất. Bạn bắt đầu tìm kiếm từ đâu?',
+                choice1: 'Kiểm tra phòng đọc',
+                choice2: 'Đi xuống tầng hầm',
+                choice1Destination: 1,
+                choice2Destination: 2,
               ),
-              child: Text(storyData[storyIndex].choice1),  // Đảm bảo `child` là tham số cuối cùng
-            ),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: () => nextStory(2),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Thay đổi từ `primary` thành `backgroundColor`
+              Story(
+                storyTitle: 'Trong phòng đọc, bạn phát hiện một mảnh giấy có ký hiệu hình ngôi sao.',
+                choice1: 'Theo dấu ký hiệu',
+                choice2: 'Hỏi người thủ thư',
+                choice1Destination: 3,
+                choice2Destination: 4,
               ),
-              child: Text(storyData[storyIndex].choice2),  // Đảm bảo `child` là tham số cuối cùng
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+              Story(
+                storyTitle: 'Tầng hầm tối và lạnh. Bạn nghe thấy tiếng động phía sau những thùng sách.',
+                choice1: 'Bật đèn pin và tiến lại gần',
+                choice2: 'Gọi người giúp đỡ',
+                choice1Destination: 5,
+                choice2Destination: 6,
+              ),
+              Story(
+                storyTitle: 'Ký hiệu dẫn bạn đến một kệ sách bí mật. Bạn tìm thấy cuốn sách cổ!',
+                choice1: 'Mang sách về thư viện',
+                choice2: 'Đọc lời nguyền trên sách',
+                choice1Destination: 7,
+                choice2Destination: 8,
+              ),
+              Story(
+                storyTitle: 'Người thủ thư nhớ ra cuốn sách được cất trong chiếc rương ở phòng lưu trữ.',
+                choice1: 'Tìm chìa khóa',
+                choice2: 'Cạy ổ khóa',
+                choice1Destination: 7,
+                choice2Destination: 8,
+              ),
+              Story(
+                storyTitle: 'Bạn tìm thấy một chú mèo đang mắc kẹt giữa các thùng sách. Nó đeo chiếc chìa khóa trên cổ!',
+                choice1: 'Cứu chú mèo',
+                choice2: 'Tiếp tục tìm sách',
+                choice1Destination: 7,
+                choice2Destination: 6,
+              ),
+              Story(
+                storyTitle: 'Bạn gọi người thủ thư. Mọi người cùng tìm kiếm và phát hiện một cánh cửa bí mật.',
+                choice1: 'Mở cánh cửa',
+                choice2: 'Quay lại phòng đọc',
+                choice1Destination: 7,
+                choice2Destination: 1,
+              ),
+              Story(
+                storyTitle: 'Chúc mừng! Cuốn sách cổ đã được đưa trở lại đúng chỗ. Thư viện được cứu!',
+                choice1: 'Chơi lại',
+                choice2: 'Bắt đầu lại',
+                choice1Destination: 0,
+                choice2Destination: 0,
+              ),
+              Story(
+                storyTitle: 'Lời nguyền khiến toàn bộ sách bay lơ lửng. Bạn cần nhờ người thủ thư hóa giải.',
+                choice1: 'Chơi lại',
+                choice2: 'Bắt đầu lại',
+                choice1Destination: 0,
+                choice2Destination: 0,
+              ),
+            ];

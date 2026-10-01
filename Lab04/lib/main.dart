@@ -21,7 +21,7 @@ class BallPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.blue,
       appBar: AppBar(
-        title: const Text('Asl me anything'),
+        title: const Text('Ask me anything'),
         centerTitle: true,
         backgroundColor: Colors.blue.shade900,
       ),
