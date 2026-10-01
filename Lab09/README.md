@@ -1,18 +1,33 @@
-# Lab09 VoGiaLuong
+# Lab09 Weather App
 
-Owner: VoGiaLuong
+A Flutter weather app that retrieves the current conditions for a city.
 
-Flutter project for Lab 09. The original lab functionality is preserved with personalized package and platform identifiers.
+## Setup
 
-## Run
+1. Obtain an API key from OpenWeather.
+2. Copy `.env.example` to `.env`.
+3. Replace the placeholder value in `.env` with your API key.
 
-`ash
+Never commit `.env`; it is ignored by Git. The app does not display the API key.
+
+## Install dependencies
+
+```bash
 flutter pub get
-flutter run
-`
+```
 
-## Test
+## Run on Chrome
 
-`ash
+```bash
+flutter run -d chrome
+```
+
+Enter a city name and select **Get Weather**. The app shows safe, user-facing messages for missing configuration, empty cities, network failures, and invalid responses.
+
+## Quality checks
+
+```bash
+flutter analyze
 flutter test
-`
+flutter build web
+```

@@ -1,104 +1,142 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
-import 'weather_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
-  await dotenv.load();  // Load file .env
-  runApp(ClimaApp());
+import 'weather_service.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  runApp(const ClimaApp());
 }
 
 class ClimaApp extends StatelessWidget {
+  const ClimaApp({super.key, this.weatherService});
+
+  final WeatherService? weatherService;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: (context, child) => Banner(
-        message: 'VoGiaLuong',
-        location: BannerLocation.bottomEnd,
-        child: child ?? const SizedBox.shrink(),
-      ),
       title: 'Clima',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: WeatherScreen(),
+      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
+      home: WeatherScreen(weatherService: weatherService),
     );
   }
 }
 
 class WeatherScreen extends StatefulWidget {
+  const WeatherScreen({super.key, this.weatherService});
+
+  final WeatherService? weatherService;
+
   @override
-  _WeatherScreenState createState() => _WeatherScreenState();
+  State<WeatherScreen> createState() => _WeatherScreenState();
 }
 
 class _WeatherScreenState extends State<WeatherScreen> {
-  final WeatherService _weatherService = WeatherService();
-  String _cityName = 'London'; // Thành phố mặc định
-  String _temperature = '';
-  String _weatherDescription = '';
-  bool _isLoading = true;  // Thêm biến trạng thái để kiểm tra xem dữ liệu đang được tải
+  late final WeatherService _weatherService;
+  final _cityController = TextEditingController(text: 'London');
+  String _cityName = 'London';
+  String? _temperature;
+  String? _weatherDescription;
+  String? _errorMessage;
+  bool _isLoading = false;
 
-  void _getWeather() async {
+  @override
+  void initState() {
+    super.initState();
+    _weatherService = widget.weatherService ?? WeatherService();
+    _getWeather();
+  }
+
+  @override
+  void dispose() {
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _getWeather() async {
+    final city = _cityController.text.trim();
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
-      var weatherData = await _weatherService.fetchWeather(_cityName);
+      final weatherData = await _weatherService.fetchWeather(city);
+      final main = weatherData['main'];
+      final weather = weatherData['weather'];
+      if (main is! Map || weather is! List || weather.isEmpty || weather.first is! Map) {
+        throw WeatherServiceException('Weather service returned incomplete data.');
+      }
+      final temperature = main['temp'];
+      final description = (weather.first as Map)['description'];
+      if (temperature == null || description is! String) {
+        throw WeatherServiceException('Weather service returned incomplete data.');
+      }
+      if (!mounted) return;
       setState(() {
-        _temperature = '${weatherData['main']['temp']}°C';
-        _weatherDescription = weatherData['weather'][0]['description'];
-        _isLoading = false;  // Dữ liệu đã được tải, không cần hiển thị loading nữa
+        _cityName = city;
+        _temperature = '$temperature°C';
+        _weatherDescription = description;
+        _isLoading = false;
       });
-    } catch (e) {
-      print('Error: $e');
+    } on WeatherServiceException catch (error) {
+      if (!mounted) return;
       setState(() {
+        _errorMessage = error.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'Something went wrong. Please try again.';
         _isLoading = false;
       });
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    _getWeather();  // Lấy dữ liệu thời tiết khi màn hình được tạo
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(dotenv.env['API_KEY'] ?? 'API Key not found'),
-      ),
+      appBar: AppBar(title: const Text('Clima Weather')),
       body: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          children: <Widget>[
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Text(
               'City: $_cityName',
-              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            Text(
-              'Temperature: $_temperature',
-              style: TextStyle(fontSize: 25.0),
-            ),
-            Text(
-              'Condition: $_weatherDescription',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 16),
+            if (_isLoading) const Center(child: CircularProgressIndicator()),
+            if (!_isLoading && _errorMessage != null)
+              Text(
+                _errorMessage!,
+                key: const Key('weatherError'),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                textAlign: TextAlign.center,
+              ),
+            if (!_isLoading && _temperature != null) ...[
+              Text('Temperature: $_temperature', style: const TextStyle(fontSize: 25)),
+              Text('Condition: $_weatherDescription', style: const TextStyle(fontSize: 20)),
+            ],
+            const SizedBox(height: 20),
             TextField(
-              onChanged: (value) {
-                setState(() {
-                  _cityName = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Enter City Name',
+              controller: _cityController,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _getWeather(),
+              decoration: const InputDecoration(
+                labelText: 'Enter city name',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _getWeather,
-              child: Text('Get Weather'),
+              onPressed: _isLoading ? null : _getWeather,
+              child: const Text('Get Weather'),
             ),
           ],
         ),
